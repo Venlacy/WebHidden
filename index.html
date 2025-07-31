@@ -5,86 +5,139 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>To-Do List</title>
     <style>
+        :root {
+            --primary-color: #6085DA;
+            --primary-hover: #526fc0;
+            --delete-color: #dc3545;
+            --delete-hover: #c82333;
+            --background-color: #f5f7fa;
+            --card-background: #ffffff;
+            --text-color: #333;
+            --border-color: #e0e0e0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            max-width: 700px;
             margin: 20px auto;
             padding: 20px;
-            padding-bottom: 50px; /* 留出底部空间给固定footer */
-            background-color: #F4F4F4;
+            padding-bottom: 60px;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
         }
+
         h1 {
             text-align: center;
-            color: #333;
+            color: var(--text-color);
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
         }
+
         .input-container {
             display: flex;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
         }
+
         #taskInput {
             flex: 1;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
+
+        #taskInput:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 5px rgba(96, 133, 218, 0.3);
+        }
+
         button {
-            padding: 10px 20px;
-            font-size: 16px;
-            background-color: #28a745;
+            padding: 12px 24px;
+            font-size: 1rem;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
+
         button:hover {
-            background-color: #218838;
+            background-color: var(--primary-hover);
         }
+
         ul {
             list-style: none;
             padding: 0;
         }
+
         li {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px;
-            background-color: white;
-            margin-bottom: 10px;
-            border-radius: 4px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 12px 16px;
+            background-color: var(--card-background);
+            margin-bottom: 12px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
+
+        li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
         li.completed {
-            background-color: #e0e0e0;
+            background-color: #e8f5e9;
             text-decoration: line-through;
+            color: #6c757d;
         }
+
+        li.completed::before {
+            content: '✔';
+            margin-right: 8px;
+            color: var(--primary-color);
+        }
+
         .delete-btn {
-            background-color: #dc3545;
+            background-color: var(--delete-color);
+            padding: 8px 16px;
+            font-size: 0.9rem;
         }
+
         .delete-btn:hover {
-            background-color: #c82333;
+            background-color: var(--delete-hover);
         }
+
         .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
             text-align: center;
-            font-size: 14px;
-            background-color: #f4f4f4;
-            padding: 10px 0;
+            font-size: 0.9rem;
+            background-color: var(--background-color);
+            padding: 12px 0;
             z-index: 500;
+            border-top: 1px solid var(--border-color);
         }
+
         .footer a {
-            color: #000000;
+            color: var(--text-color);
             text-decoration: none;
-            cursor: default; /* 移除点击图标 */
+            cursor: default;
         }
-        /* 移除hover效果 */
+
         .footer a:hover {
             text-decoration: none;
         }
+
         #protocolFrame {
             display: none;
             position: fixed;
@@ -94,20 +147,40 @@
             height: 100vh;
             border: none;
             z-index: 1000;
-            background-color: white;
+            background-color: var(--card-background);
         }
+
         .error-message {
-            color: #dc3545;
-            font-size: 14px;
+            color: var(--delete-color);
+            font-size: 0.9rem;
             display: none;
             margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+                padding-bottom: 70px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <h1>To-Do List</h1>
     <div class="input-container">
-        <input type="text" id="taskInput" placeholder="输入新任务">
+        <input type="text" id="taskInput" placeholder="输入新任务" aria-label="输入新任务">
         <button onclick="addTask()">添加任务</button>
     </div>
     <ul id="taskList"></ul>
