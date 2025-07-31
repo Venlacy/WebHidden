@@ -227,7 +227,7 @@
         // 加载任务
         document.addEventListener('DOMContentLoaded', loadTasks);
 
-        let clickCount = 0; // 添加点击计数器
+        let clickTimestamps = []; // 存储点击时间戳
 
         function loadTasks() {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -300,19 +300,23 @@
             const errorMessage = document.getElementById('errorMessage');
             if (!iframe || !errorMessage) return;
 
-            clickCount++; // 增加点击计数
+            const currentTime = Date.now();
+            clickTimestamps.push(currentTime); // 记录当前点击时间戳
 
-            if (clickCount < 3) {
-                // 点击少于3次，无任何提示，直接返回
+            // 清理超过1秒的旧时间戳
+            clickTimestamps = clickTimestamps.filter(timestamp => currentTime - timestamp <= 700);
+
+            // 如果点击次数少于3次，直接返回
+            if (clickTimestamps.length < 3) {
                 return;
             }
 
-            // 点击达到3次，打开网页
+            // 点击达到3次，且在1秒内，打开网页
             if (iframe.style.display === 'block') {
                 iframe.style.display = 'none';
                 iframe.src = '';
                 errorMessage.style.display = 'none';
-                clickCount = 0; // 重置计数器
+                clickTimestamps = []; // 重置时间戳数组
             } else {
                 try {
                     iframe.src = 'https://c.venlacy.top/';
@@ -322,7 +326,7 @@
                         iframe.style.display = 'none';
                         iframe.src = '';
                         errorMessage.style.display = 'block';
-                        clickCount = 0; // 重置计数器
+                        clickTimestamps = []; // 重置时间戳数组
                     };
                     iframe.onload = () => {
                         errorMessage.style.display = 'none';
@@ -332,7 +336,7 @@
                     iframe.style.display = 'none';
                     iframe.src = '';
                     errorMessage.style.display = 'block';
-                    clickCount = 0; // 重置计数器
+                    clickTimestamps = []; // 重置时间戳数组
                 }
             }
         }
