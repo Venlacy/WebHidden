@@ -10,6 +10,7 @@
             max-width: 600px;
             margin: 20px auto;
             padding: 20px;
+            padding-bottom: 50px; /* 留出底部空间给固定footer */
             background-color: #f4f4f4;
         }
         h1 {
@@ -65,13 +66,18 @@
             background-color: #c82333;
         }
         .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
             text-align: center;
-            margin-top: 20px;
             font-size: 14px;
-            color: #666;
+            background-color: #f4f4f4;
+            padding: 10px 0;
+            z-index: 500;
         }
         .footer a {
-            color: #007bff;
+            color: #000000;
             text-decoration: none;
             cursor: pointer;
         }
@@ -93,7 +99,7 @@
             color: #dc3545;
             font-size: 14px;
             display: none;
-            margin-top: 10px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -105,9 +111,9 @@
     </div>
     <ul id="taskList"></ul>
     <div class="footer">
-        <a onclick="showProtocol()">网页协议</a>
         <div id="errorMessage" class="error-message">无法加载网页协议，请稍后重试。</div>
         <iframe id="protocolFrame" src=""></iframe>
+        <a onclick="showProtocol()">备案号：川114514号</a>
     </div>
 
     <script>
