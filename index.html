@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #taskInput {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        li.completed {
+            background-color: #e0e0e0;
+            text-decoration: line-through;
+        }
+        .delete-btn {
+            background-color: #dc3545;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+        .footer a {
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+        #protocolFrame {
+            display: none;
+            width: 100%;
+            height: 400px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 14px;
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>To-Do List</h1>
+    <div class="input-container">
+        <input type="text" id="taskInput" placeholder="输入新任务">
+        <button onclick="addTask()">添加任务</button>
+    </div>
+    <ul id="taskList"></ul>
+    <div class="footer">
+        <a onclick="showProtocol()">网页协议</a>
+        <div id="errorMessage" class="error-message">无法加载网页协议，请稍后重试。</div>
+        <iframe id="protocolFrame" src=""></iframe>
+    </div>
+
+    <script>
+        // 加载任务
+        document.addEventListener('DOMContentLoaded', loadTasks);
+
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => renderTask(task));
+        }
+
+        function addTask() {
+            const taskInput = document.getElementById('taskInput');
+            const taskText = taskInput?.value?.trim();
+            if (!taskText) {
+                alert('请输入任务内容！');
+                return;
+            }
+            const task = {
+                id: Date.now(),
+                text: taskText,
+                completed: false
+            };
+            saveTask(task);
+            renderTask(task);
+            taskInput.value = '';
+        }
+
+        function saveTask(task) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.push(task);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        function renderTask(task) {
+            const taskList = document.getElementById('taskList');
+            if (!taskList) return;
+            const li = document.createElement('li');
+            li.className = task.completed ? 'completed' : '';
+            li.innerHTML = `
+                <span onclick="toggleTask(${task.id})">${task.text}</span>
+                <button class="delete-btn" onclick="deleteTask(${task.id})">删除</button>
+            `;
+            taskList.appendChild(li);
+        }
+
+        function toggleTask(id) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const updatedTasks = tasks.map(task => {
+                if (task.id === id) {
+                    task.completed = !task.completed;
+                }
+                return task;
+            });
+            localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            refreshTaskList();
+        }
+
+        function deleteTask(id) {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            const updatedTasks = tasks.filter(task => task.id !== id);
+            localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+            refreshTaskList();
+        }
+
+        function refreshTaskList() {
+            const taskList = document.getElementById('taskList');
+            if (!taskList) return;
+            taskList.innerHTML = '';
+            loadTasks();
+        }
+
+        function showProtocol() {
+            const iframe = document.getElementById('protocolFrame');
+            const errorMessage = document.getElementById('errorMessage');
+            if (!iframe || !errorMessage) return;
+
+            if (iframe.style.display === 'block') {
+                iframe.style.display = 'none';
+                iframe.src = '';
+                errorMessage.style.display = 'none';
+            } else {
+                try {
+                    iframe.src = 'https://c.venlacy.top';
+                    iframe.style.display = 'block';
+                    iframe.onerror = () => {
+                        iframe.style.display = 'none';
+                        iframe.src = '';
+                        errorMessage.style.display = 'block';
+                    };
+                    iframe.onload = () => {
+                        errorMessage.style.display = 'none';
+                    };
+                } catch (e) {
+                    console.error('Failed to load protocol:', e);
+                    iframe.style.display = 'none';
+                    iframe.src = '';
+                    errorMessage.style.display = 'block';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
