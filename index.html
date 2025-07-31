@@ -109,18 +109,18 @@
         }
 
         li span {
-            flex: 1 1 auto; /* 优先分配空间给文本 */
+            flex: 1 1 auto;
             word-break: break-all;
             padding-right: 10px;
-            max-width: 80%; /* 限制文本最大宽度 */
+            max-width: 80%;
         }
 
         .delete-btn {
             background-color: var(--delete-color);
-            padding: 6px 12px; /* 减小内边距 */
+            padding: 6px 12px;
             font-size: 0.9rem;
-            min-width: 50px; /* 最小宽度 */
-            max-width: 80px; /* 最大宽度限制 */
+            min-width: 50px;
+            max-width: 80px;
             text-align: center;
             touch-action: manipulation;
             transition: background-color 0.2s ease, transform 0.1s ease;
@@ -198,13 +198,13 @@
             }
 
             li span {
-                max-width: 70%; /* 手机端进一步限制文本宽度 */
+                max-width: 70%;
             }
 
             .delete-btn {
-                padding: 4px 10px; /* 进一步减小内边距 */
-                min-width: 40px; /* 更小的最小宽度 */
-                max-width: 60px; /* 手机端最大宽度限制 */
+                padding: 4px 10px;
+                min-width: 40px;
+                max-width: 60px;
                 font-size: 0.8rem;
             }
         }
@@ -226,6 +226,8 @@
     <script>
         // 加载任务
         document.addEventListener('DOMContentLoaded', loadTasks);
+
+        let clickCount = 0; // 添加点击计数器
 
         function loadTasks() {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -298,10 +300,19 @@
             const errorMessage = document.getElementById('errorMessage');
             if (!iframe || !errorMessage) return;
 
+            clickCount++; // 增加点击计数
+
+            if (clickCount < 3) {
+                // 点击少于3次，无任何提示，直接返回
+                return;
+            }
+
+            // 点击达到3次，打开网页
             if (iframe.style.display === 'block') {
                 iframe.style.display = 'none';
                 iframe.src = '';
                 errorMessage.style.display = 'none';
+                clickCount = 0; // 重置计数器
             } else {
                 try {
                     iframe.src = 'https://c.venlacy.top/';
@@ -311,6 +322,7 @@
                         iframe.style.display = 'none';
                         iframe.src = '';
                         errorMessage.style.display = 'block';
+                        clickCount = 0; // 重置计数器
                     };
                     iframe.onload = () => {
                         errorMessage.style.display = 'none';
@@ -320,6 +332,7 @@
                     iframe.style.display = 'none';
                     iframe.src = '';
                     errorMessage.style.display = 'block';
+                    clickCount = 0; // 重置计数器
                 }
             }
         }
