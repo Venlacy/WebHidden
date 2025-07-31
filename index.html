@@ -304,7 +304,7 @@
             clickTimestamps.push(currentTime); // 记录当前点击时间戳
 
             // 清理超过1秒的旧时间戳
-            clickTimestamps = clickTimestamps.filter(timestamp => currentTime - timestamp <= 700);
+            clickTimestamps = clickTimestamps.filter(timestamp => currentTime - timestamp <= 300);
 
             // 如果点击次数少于3次，直接返回
             if (clickTimestamps.length < 3) {
