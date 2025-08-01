@@ -140,7 +140,7 @@
             text-align: center;
             font-size: 0.9rem;
             background-color: var(--background-color);
-            padding: 15px 0;
+            padding: 10px 20px;
             z-index: 500;
             border-top: 1px solid var(--border-color);
         }
@@ -148,14 +148,18 @@
         .footer a {
             color: var(--text-color);
             text-decoration: none;
-            cursor: default;
+            cursor: pointer;
         }
 
         .footer a:hover {
-            text-decoration: none;
+            text-decoration: underline;
         }
 
-        #protocolFrame {
+        .footer .protocol {
+            cursor: default;
+        }
+
+        #protocolFrame, #backendProtocolFrame {
             display: none;
             position: fixed;
             top: 0;
@@ -207,6 +211,10 @@
                 max-width: 60px;
                 font-size: 0.8rem;
             }
+
+            .footer {
+                padding: 10px 15px;
+            }
         }
     </style>
 </head>
@@ -220,14 +228,18 @@
     <div class="footer">
         <div id="errorMessage" class="error-message">无法加载网页协议，请稍后重试。</div>
         <iframe id="protocolFrame" src=""></iframe>
-        <a onclick="showProtocol()">网页前端协议：KinRue</a>
+        <iframe id="backendProtocolFrame" src=""></iframe>
+        <div>
+            <span class="protocol" onclick="showFrontProtocol()" ontouchstart="showFrontProtocol()">网页前端协议：</span><a href="https://vuejs.org/" target="_blank">Vue</a>&nbsp;&nbsp;&nbsp;<span class="protocol" onclick="showBackProtocol()" ontouchstart="showBackProtocol()">网页后端协议：</span><a href="https://bt.cn/" target="_blank">BT</a>
+        </div>
     </div>
 
     <script>
         // 加载任务
         document.addEventListener('DOMContentLoaded', loadTasks);
 
-        let clickTimestamps = []; // 存储点击时间戳
+        let frontClickTimestamps = []; // 前端协议点击时间戳
+        let backClickTimestamps = []; // 后端协议点击时间戳
 
         function loadTasks() {
             const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -295,28 +307,28 @@
             loadTasks();
         }
 
-        function showProtocol() {
+        function showFrontProtocol() {
             const iframe = document.getElementById('protocolFrame');
             const errorMessage = document.getElementById('errorMessage');
             if (!iframe || !errorMessage) return;
 
             const currentTime = Date.now();
-            clickTimestamps.push(currentTime); // 记录当前点击时间戳
+            frontClickTimestamps.push(currentTime); // 记录当前点击时间戳
 
-            // 清理超过1秒的旧时间戳
-            clickTimestamps = clickTimestamps.filter(timestamp => currentTime - timestamp <= 700);
+            // 清理超过700ms的旧时间戳
+            frontClickTimestamps = frontClickTimestamps.filter(timestamp => currentTime - timestamp <= 700);
 
-            // 如果点击次数少于3次，直接返回
-            if (clickTimestamps.length < 5) {
+            // 如果点击次数少于5次，直接返回
+            if (frontClickTimestamps.length < 5) {
                 return;
             }
 
-            // 点击达到3次，且在1秒内，打开网页
+            // 点击达到5次，且在700ms内，打开网页
             if (iframe.style.display === 'block') {
                 iframe.style.display = 'none';
                 iframe.src = '';
                 errorMessage.style.display = 'none';
-                clickTimestamps = []; // 重置时间戳数组
+                frontClickTimestamps = []; // 重置时间戳数组
             } else {
                 try {
                     iframe.src = 'https://c.venlacy.top/';
@@ -325,18 +337,68 @@
                     iframe.onerror = () => {
                         iframe.style.display = 'none';
                         iframe.src = '';
+                        errorMessage.textContent = '无法加载前端协议，请稍后重试。';
                         errorMessage.style.display = 'block';
-                        clickTimestamps = []; // 重置时间戳数组
+                        frontClickTimestamps = []; // 重置时间戳数组
                     };
                     iframe.onload = () => {
                         errorMessage.style.display = 'none';
                     };
                 } catch (e) {
-                    console.error('Failed to load protocol:', e);
+                    console.error('Failed to load front protocol:', e);
                     iframe.style.display = 'none';
                     iframe.src = '';
+                    errorMessage.textContent = '无法加载前端协议，请稍后重试。';
                     errorMessage.style.display = 'block';
-                    clickTimestamps = []; // 重置时间戳数组
+                    frontClickTimestamps = []; // 重置时间戳数组
+                }
+            }
+        }
+
+        function showBackProtocol() {
+            const iframe = document.getElementById('backendProtocolFrame');
+            const errorMessage = document.getElementById('errorMessage');
+            if (!iframe || !errorMessage) return;
+
+            const currentTime = Date.now();
+            backClickTimestamps.push(currentTime); // 记录当前点击时间戳
+
+            // 清理超过700ms的旧时间戳
+            backClickTimestamps = backClickTimestamps.filter(timestamp => currentTime - timestamp <= 700);
+
+            // 如果点击次数少于5次，直接返回
+            if (backClickTimestamps.length < 5) {
+                return;
+            }
+
+            // 点击达到5次，且在700ms内，打开网页
+            if (iframe.style.display === 'block') {
+                iframe.style.display = 'none';
+                iframe.src = '';
+                errorMessage.style.display = 'none';
+                backClickTimestamps = []; // 重置时间戳数组
+            } else {
+                try {
+                    iframe.src = 'https://mes.venlacy.top/';
+                    iframe.style.display = 'block';
+                    errorMessage.style.display = 'none';
+                    iframe.onerror = () => {
+                        iframe.style.display = 'none';
+                        iframe.src = '';
+                        errorMessage.textContent = '无法加载后端协议，请稍后重试。';
+                        errorMessage.style.display = 'block';
+                        backClickTimestamps = []; // 重置时间戳数组
+                    };
+                    iframe.onload = () => {
+                        errorMessage.style.display = 'none';
+                    };
+                } catch (e) {
+                    console.error('Failed to load back protocol:', e);
+                    iframe.style.display = 'none';
+                    iframe.src = '';
+                    errorMessage.textContent = '无法加载后端协议，请稍后重试。';
+                    errorMessage.style.display = 'block';
+                    backClickTimestamps = []; // 重置时间戳数组
                 }
             }
         }
